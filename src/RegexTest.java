@@ -2,26 +2,42 @@
  * Created by DixonShen on 2016/5/16.
  */
 
+import java.nio.file.Paths;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.*;
 
 public class RegexTest {
+
+    public static final String seed1 = "品牌";
+    public static final String seed2 = "Apple";
+
     public static void main(String[] args) {
-        String line = "This order was placed for QT3000! OK?";
-        String pattern = "(.*)(\\d+)(.*)";
-
-        Pattern r = Pattern.compile(pattern);
-
-        Matcher m = r.matcher(line);
-        if(m.find()){
-            System.out.println("Found Value: " + m.group(0) );
-            System.out.println("Found Value: " + m.group(1) );
-            System.out.println("Found Value: " + m.group(2) );
+        String s = "";
+        String temp;
+        int count = 0;
+        try {
+            FileReader fr = new FileReader("testJD.html");
+            BufferedReader br = new BufferedReader(fr);
+            while ((temp = br.readLine()) != null) {
+                s += temp;
+            }
+            br.close();
+            System.out.println(s);
+            String InitialPattern = ">" + seed1 + "<.+>" + seed2 + "<";
+            System.out.println(InitialPattern);
+            Pattern p = Pattern.compile(InitialPattern);
+            Matcher m = p.matcher(s);
+            while (m.find()) {
+                count++;
+                System.out.println(m.group());
+            }
+            System.out.println(count);
+        } catch (IOException e) {
+            System.out.println("Exception");
         }
-        else{
-            System.out.print("NO MATCH");
-        }
+
     }
-
 
 }
