@@ -107,7 +107,7 @@ public class HttpGetUtils {
     }
 
     /**
-     * 保存王爷字节数组到本地文件  filePath为要保存的文件的相对地址
+     * 保存网页字节数组到本地文件  filePath为要保存的文件的相对地址
      * @param data
      * @param filePath
      */
