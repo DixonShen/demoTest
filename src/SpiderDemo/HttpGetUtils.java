@@ -7,12 +7,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.xml.ws.http.HTTPException;
+import java.io.*;
 
 /**
  * Created by DixonShen on 2016/7/6.
+ * 根据得到的url，爬取网页内容，下载到本地保存
  */
 public class HttpGetUtils {
 
@@ -83,6 +83,46 @@ public class HttpGetUtils {
             }
         }
         return res.toString();
+    }
+
+    /**
+     * 根据url和网页类型生成需要保存的网页的文件名  去除掉url中的非文件名字符
+     * @param url
+     * @param contentType
+     * @return
+     */
+    public String getFileNameByUrl(String url, String contentType){
+        //remove http://
+        url = url.substring(7);
+        //text/html类型
+        if (contentType.indexOf("html") != -1){
+            url = url.replaceAll("[\\?/:*|<>\"]","_") + ".html";
+            return url;
+        }
+        //如application/pdf类型
+        else {
+            return url.replaceAll("[\\?/:*|<>\"]","_") + "."
+                    + contentType.substring(contentType.lastIndexOf("/" + 1));
+        }
+    }
+
+    /**
+     * 保存网页字节数组到本地文件  filePath为要保存的文件的相对地址
+     * @param data
+     * @param filePath
+     */
+    public void saveToLocal(byte[] data, String filePath){
+        try {
+            DataOutputStream out = new DataOutputStream(new FileOutputStream(
+                    new File(filePath)));
+            for (int i=0; i<data.length;i++)
+                out.write(data[i]);
+            out.flush();
+            out.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
 //    public static void main(String[] args) {
