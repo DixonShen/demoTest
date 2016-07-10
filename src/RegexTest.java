@@ -2,7 +2,6 @@
  * Created by DixonShen on 2016/5/16.
  */
 
-import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
