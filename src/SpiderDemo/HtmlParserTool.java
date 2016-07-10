@@ -8,7 +8,8 @@ import org.htmlparser.filters.LinkStringFilter;
 import org.htmlparser.filters.NodeClassFilter;
 import org.htmlparser.filters.OrFilter;
 import org.htmlparser.tags.LinkTag;
-import org.w3c.dom.NodeList;
+import org.htmlparser.util.NodeList;
+import org.htmlparser.util.ParserException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +23,7 @@ import java.util.Set;
 public class HtmlParserTool {
 
     //获取一个网站上的链接，filter用来过滤链接
-    public static Set<String> extractLinks(String url, LinkStringFilter filter){
+    public static Set<String> extractLinks(String url, LinkRegexFilter filter){
         Set<String> links = new HashSet<String>();
         try {
             Parser parser = new Parser(url);
@@ -41,10 +42,29 @@ public class HtmlParserTool {
                     LinkTag.class), frameFilter);
             //得到所有经过过滤的标签
             NodeList list = parser.extractAllNodesThatMatch(linkFilter);
-            for (int i=0; i<list.getLength(); i++){
-                Node tag = list.
+            for (int i=0; i<list.size(); i++){
+                Node tag = list.elementAt(i);
+                if (tag instanceof LinkTag){       //<a>标签
+                    LinkTag link = (LinkTag) tag;
+                    String linkUrl = link.getLink();
+                    if (filter.accept(link))
+                        links.add(linkUrl);
+                }else {                           //<frame>标签
+                    //提取frame标签里src属性的链接如 <frame src="test.html"/>
+                    String frame = tag.getText();
+                    int start = frame.indexOf("src=");
+                    frame = frame.substring(start);
+                    int end = frame.indexOf(" ");
+                    if (end == -1){
+                        end = frame.indexOf(">");
+                    }
+
+                }
             }
+        }catch (ParserException e){
+            e.printStackTrace();
         }
+        return links;
     }
 
 }
