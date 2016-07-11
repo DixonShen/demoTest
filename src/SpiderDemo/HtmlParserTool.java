@@ -23,7 +23,7 @@ import java.util.Set;
 public class HtmlParserTool {
 
     //获取一个网站上的链接，filter用来过滤链接
-    public static Set<String> extractLinks(String url, LinkRegexFilter filter){
+    public static Set<String> extractLinks(String url, LinkStringFilter filter){
         Set<String> links = new HashSet<String>();
         try {
             Parser parser = new Parser(url);
@@ -52,13 +52,15 @@ public class HtmlParserTool {
                 }else {                           //<frame>标签
                     //提取frame标签里src属性的链接如 <frame src="test.html"/>
                     String frame = tag.getText();
-                    int start = frame.indexOf("src=");
+                    int start = frame.indexOf("src=\"");
                     frame = frame.substring(start);
                     int end = frame.indexOf(" ");
                     if (end == -1){
                         end = frame.indexOf(">");
                     }
-
+                    String frameUrl = frame.substring(5,end-1);
+                    if (filter.accept(tag)) //待测试
+                        links.add(frameUrl);
                 }
             }
         }catch (ParserException e){

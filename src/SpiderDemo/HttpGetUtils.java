@@ -17,16 +17,18 @@ import java.io.*;
 public class HttpGetUtils {
 
     /**
-     * get 方法
-     *
+     *下载url指向的网页
      * @param url
      * @return
      */
-    public static String get(String url) {
+    public static String downloadFile(String url) {
         String result = "";
+        String filePath = null;
         try {
-            //获取httpclient实例
+            //生成httpclient对象
             CloseableHttpClient httpclient = HttpClients.createDefault();
+//            //设置http连接超时 5s
+//            httpclient.getConnectionManager();
             //获取方法实例 GET
             HttpGet httpGet = new HttpGet(url);
             //执行方法得到响应
@@ -39,10 +41,17 @@ public class HttpGetUtils {
                     HttpEntity entity = response.getEntity();
                     //从输入流中解析结果
                     result = readResponse(entity, "utf-8");
+                    filePath = "f:\\spider\\"
+                            + getFileNameByUrl(url,
+                            response.getFirstHeader("Content-Type").getValue());
+                    saveToLocal(result.getBytes(),filePath);
+                } else {
+                    System.err.println("Method failed: "
+                            + response.getStatusLine());
+                    filePath = null;
                 }
             } finally {
-                httpclient.close();
-                response.close();
+                httpGet.releaseConnection();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +100,7 @@ public class HttpGetUtils {
      * @param contentType
      * @return
      */
-    public String getFileNameByUrl(String url, String contentType){
+    public static String getFileNameByUrl(String url, String contentType){
         //remove http://
         url = url.substring(7);
         //text/html类型
@@ -111,7 +120,7 @@ public class HttpGetUtils {
      * @param data
      * @param filePath
      */
-    public void saveToLocal(byte[] data, String filePath){
+    public static void saveToLocal(byte[] data, String filePath){
         try {
             DataOutputStream out = new DataOutputStream(new FileOutputStream(
                     new File(filePath)));
